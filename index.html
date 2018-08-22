@@ -14,6 +14,7 @@
   <div id="root"></div>
   <script type="text/babel">
     ( () => {
+      'use strict'
 
     function shuffule(targetArray){
       for( let i = targetArray.length -1 ; i > 0 ; i-- ){
@@ -64,7 +65,7 @@
         temp.push( props.numbersData.slice(begin , end));
         begin += props.numbersLength ;
         end += props.numbersLength ;
-        console.log( begin ,end);
+        // console.log( begin ,end);
       }
 
       const numberRows = temp.map( (numberChunk,index) =>{
@@ -94,6 +95,10 @@
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
           </select>
         </div>
       );
@@ -125,15 +130,20 @@
           let numbersData = this.state.numbersData.map( numberData =>{
             return { number:numberData.number , isClicked:numberData.isClicked };
           });
+          // console.log(numbersData);
           const pos = numbersData.map( numberData =>{
             return numberData.number;
           }).indexOf(clickNumber);
           //numbersData[pos].isClicked = !numbersData[pos].isClicked;
           numbersData[pos].isClicked = true ;
 
+          if( clickNumber === this.state.length ** 2 ){
+            alert("finished");
+          }
+
           this.setState({
             numbersData: numbersData ,
-            currentNumber: this.state.currentNumber +1
+            currentNumber: this.state.currentNumber + 1
           });
         }
       }
@@ -157,10 +167,7 @@
       }
 
       componentDidMount(){
-        const numbersData = this.createNumbers(this.state.length);
-        // this.setState({
-        //   numbersData: numbersData
-        // });
+        this.createNumbers(this.state.length);
       }
 
       componentDidUpdate(){
