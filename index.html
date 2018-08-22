@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    ( () => {
+
+    function shuffule(targetArray){
+      for( let i = targetArray.length -1 ; i > 0 ; i-- ){
+        let r = Math.floor(Math.random() * (i+1));
+        let tmp = targetArray[i];
+        targetArray[i] = targetArray[r];
+        targetArray[r] = tmp;
+      }
+    }
+
+    function NumberRow(props){
+      let randNumbers = [];
+      for( let i = 0 ; i < props.numbersLength ; i++ ){
+        randNumbers.push( (props.rowIndex-1) * props.numbersLength + i + 1 );
+      }
+
+      shuffule( randNumbers );
+
+      const numbers = randNumbers.map( number => {
+        return(
+          <div key={ "row" + props.rowIndex * number} className="number">{ number }</div>
+        );
+      });
+
+
+      //numberRow.push('</div>');
+      return(
+        <div>
+        {numbers}
+        </div>
+      );
+    }
+
+    function NumberRows(props){
+      let numberRows = [] ;
+
+      for( let i = 0 ; i < props.numbersLength ; i++ ){
+        numberRows.push(
+          (<NumberRow key={i}
+           rowIndex={i+1}
+           numbersLength={ props.numbersLength}
+          />)
+        );
+      }
+
+      return(
+        <div>
+          { numberRows }
+        </div>
+      );
+    }
+
+    function NumbersHeader(props){
+      return(
+        <div className="header">
+          <h1>ClickNumbers</h1>
+          <span>SelectLevel</span>
+          <select className="select" onChange={ props.selectLevel}>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+      );
+    }
+
+    class App extends React.Component{
+      constructor(){
+        super();
+        this.state = {
+          length: 3
+        }
+
+        this.selectLevel = this.selectLevel.bind(this);
+      }
+
+      selectLevel(e){
+        e.preventDefault();
+        console.log( e.target.value);
+        this.setState({
+          length: e.target.value
+        });
+      }
+
+      render(){
+        return(
+          <div className="container">
+            <NumbersHeader selectLevel={ this.selectLevel }/>
+            <NumberRows numbersLength={ this.state.length }/>
+          </div>
+        );
+      };
+    }
+
+    ReactDOM.render(
+      <App />,
+      document.getElementById('root')
+    );
+
+    })();
+  </script>
+</body>
+</html>
