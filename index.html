@@ -24,44 +24,63 @@
       }
     }
 
+    function Number(props){
+      return(
+        <div
+          onClick={ props.clickNumber }
+          key={ "row" + props.rowIndex * props.number}
+          className={ props.isClicked ? "number isClicked" : "number"}>
+          { props.number }
+        </div>
+      );
+    }
+
     function NumberRow(props){
-      let randNumbers = [];
-      for( let i = 0 ; i < props.numbersLength ; i++ ){
-        randNumbers.push( (props.rowIndex-1) * props.numbersLength + i + 1 );
-      }
-
-      shuffule( randNumbers );
-
-      const numbers = randNumbers.map( number => {
+      const numbers = props.numberChunk.map( number =>{
         return(
-          <div key={ "row" + props.rowIndex * number} className="number">{ number }</div>
+          <Number
+            number={number.number}
+            isClicked={ number.isClicked}
+            key={number.number}
+            clickNumber={props.clickNumber}
+          />
         );
       });
 
-
-      //numberRow.push('</div>');
       return(
         <div>
-        {numbers}
+          {numbers}
         </div>
       );
     }
 
     function NumberRows(props){
-      let numberRows = [] ;
-
+      let temp = [] ;
+      let begin = 0 ;
+      let end = props.numbersLength ;
+      //console.log( props.numbersData);
+      //Create NumbersChunks
       for( let i = 0 ; i < props.numbersLength ; i++ ){
-        numberRows.push(
-          (<NumberRow key={i}
-           rowIndex={i+1}
-           numbersLength={ props.numbersLength}
-          />)
-        );
+        temp.push( props.numbersData.slice(begin , end));
+        begin += props.numbersLength ;
+        end += props.numbersLength ;
+        console.log( begin ,end);
       }
+
+      const numberRows = temp.map( (numberChunk,index) =>{
+        return(
+          <div key={ "row" + index }>
+            <NumberRow
+              numberChunk={ numberChunk }
+              clickNumber={props.clickNumber}
+            />
+          </div>
+        );
+      });
 
       return(
         <div>
-          { numberRows }
+          {numberRows}
         </div>
       );
     }
@@ -84,25 +103,81 @@
       constructor(){
         super();
         this.state = {
-          length: 3
+          length: 3,
+          currentNumber: 1 ,
+          numbersData:[]
         }
 
         this.selectLevel = this.selectLevel.bind(this);
+        this.clickNumber = this.clickNumber.bind(this);
+        this.createNumbers = this.createNumbers.bind(this);
       }
 
       selectLevel(e){
         e.preventDefault();
-        console.log( e.target.value);
+        let length = +e.target.value;
+        this.createNumbers(length);
+      }
+
+      clickNumber(e){
+        let clickNumber = +e.target.innerHTML ;
+        if( clickNumber === this.state.currentNumber ){
+          let numbersData = this.state.numbersData.map( numberData =>{
+            return { number:numberData.number , isClicked:numberData.isClicked };
+          });
+          const pos = numbersData.map( numberData =>{
+            return numberData.number;
+          }).indexOf(clickNumber);
+          //numbersData[pos].isClicked = !numbersData[pos].isClicked;
+          numbersData[pos].isClicked = true ;
+
+          this.setState({
+            numbersData: numbersData ,
+            currentNumber: this.state.currentNumber +1
+          });
+        }
+      }
+
+      createNumbers( length ){
+        let numbersData = [] ;
+        //配置する数字初期値を生成する
+        for( let i = 0 ; i < length ** 2 ; i++ ){
+          numbersData.push({
+            number: i + 1 ,
+            isClicked : false
+          });
+        }
+        shuffule(numbersData);
+        // return numbersData;
         this.setState({
-          length: e.target.value
+          numbersData: numbersData ,
+          length:length,
+          currentNumber:1
         });
+      }
+
+      componentDidMount(){
+        const numbersData = this.createNumbers(this.state.length);
+        // this.setState({
+        //   numbersData: numbersData
+        // });
+      }
+
+      componentDidUpdate(){
+        //console.log( this.state.numbersData);
       }
 
       render(){
         return(
           <div className="container">
-            <NumbersHeader selectLevel={ this.selectLevel }/>
-            <NumberRows numbersLength={ this.state.length }/>
+            <NumbersHeader
+              selectLevel={ this.selectLevel }
+            />
+            <NumberRows
+              numbersData={ this.state.numbersData }
+              numbersLength={ this.state.length }
+              clickNumber={ this.clickNumber }
+            />
           </div>
         );
       };

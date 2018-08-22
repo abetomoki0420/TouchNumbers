@@ -17,6 +17,11 @@
   user-select: none;
 }
 
+.isClicked{
+  background: #fff067;
+  opacity: 0.7;
+}
+
 .select{
   margin-left: 5px ;
 }
